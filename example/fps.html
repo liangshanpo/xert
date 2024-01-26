@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <title>Example</title>
+        <style>
+            html,
+            body {
+                margin: 0;
+                height: 100%;
+            }
+            #container {
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
+            #map-canvas {
+                position: absolute;
+                right: 5px;
+                top: 5px;
+                z-index: 101;
+                border: 1px dashed #000;
+                transform: rotateZ(0deg);
+                border-radius: 50%;
+            }
+
+            #loading-screen {
+                position: absolute;
+                z-index: 102;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: #000000;
+                opacity: 1;
+            }
+            #loading-screen.fade-out {
+                opacity: 0;
+                transition: opacity 5s ease-in-out;
+            }
+            #loading-bar {
+                position: relative;
+                top: 50%;
+                width: 100%;
+                height: 2px;
+                background: #ffffff;
+                transform: scaleX(0.3);
+                transform-origin: top left;
+                transition: transform 0.5s;
+            }
+
+
+            #loader {
+                display: block;
+                position: relative;
+                left: 50%;
+                top: 50%;
+                width: 150px;
+                height: 150px;
+                margin: -75px 0 0 -75px;
+                border-radius: 50%;
+                border: 3px solid transparent;
+                border-top-color: #9370DB;
+                -webkit-animation: spin 2s linear infinite;
+                animation: spin 2s linear infinite;
+            }
+            #loader:before {
+                content: "";
+                position: absolute;
+                top: 5px;
+                left: 5px;
+                right: 5px;
+                bottom: 5px;
+                border-radius: 50%;
+                border: 3px solid transparent;
+                border-top-color: #BA55D3;
+                -webkit-animation: spin 3s linear infinite;
+                animation: spin 3s linear infinite;
+            }
+            #loader:after {
+                content: "";
+                position: absolute;
+                top: 15px;
+                left: 15px;
+                right: 15px;
+                bottom: 15px;
+                border-radius: 50%;
+                border: 3px solid transparent;
+                border-top-color: #FF00FF;
+                -webkit-animation: spin 1.5s linear infinite;
+                animation: spin 1.5s linear infinite;
+            }
+            @-webkit-keyframes spin {
+                0%   {
+                    -webkit-transform: rotate(0deg);
+                    -ms-transform: rotate(0deg);
+                    transform: rotate(0deg);
+                }
+                100% {
+                    -webkit-transform: rotate(360deg);
+                    -ms-transform: rotate(360deg);
+                    transform: rotate(360deg);
+                }
+            }
+            @keyframes spin {
+                0%   {
+                    -webkit-transform: rotate(0deg);
+                    -ms-transform: rotate(0deg);
+                    transform: rotate(0deg);
+                }
+                100% {
+                    -webkit-transform: rotate(360deg);
+                    -ms-transform: rotate(360deg);
+                    transform: rotate(360deg);
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div id="container"></div>
+        <div id="loading-screen"><div id="loading-bar"></div></div>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "./lib/three.module.js",
+                    "gltfloader": "./lib/GLTFLoader.js",
+                    "three/addons/utils/BufferGeometryUtils.js": "./utils/BufferGeometryUtils.js",
+                    "xert": "../dist/xert.module.js"
+                }
+            }
+        </script>
+        <script type="module">
+            import * as THREE from 'three'
+            import {GLTFLoader} from 'gltfloader'
+            import {Xert, Minimap, NavMeshGenerator} from 'xert'
+
+            function manager() {
+                this.container = document.getElementById('container')
+                this.scene = new THREE.Scene()
+                this.renderer = new THREE.WebGLRenderer({antialias:true})
+                this.renderer.setPixelRatio(window.devicePixelRatio)
+			    this.renderer.setSize(window.innerWidth, window.innerHeight)
+                this.camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 300)
+                // this.camera.position.z = 10
+                this.camera.position.y = 10
+                this.camera.lookAt(0, 0, 0)
+                this.camera.layers.enable(1)
+
+                this.clock = new THREE.Clock()
+
+                this.loadingManager = new THREE.LoadingManager(()=>{
+                    document.getElementById('loading-screen').classList.add('fade-out')
+                }, (url, loaded, total)=>{
+                    document.getElementById('loading-bar').style.transform = `scaleX(${loaded / total})`
+                })
+
+                this.minimap = new Minimap({
+                    parent: this.container,
+                    scene: this.scene,
+                    target: 'actor',
+                    frustum: 40,
+                    size: 160
+                })
+            }
+            // const container = document.getElementById('con')
+            // const scene = new THREE.Scene()
+            // const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 30)
+            // const renderer = new THREE.WebGLRenderer({antialias:true})
+            // renderer.setPixelRatio( window.devicePixelRatio )
+            // renderer.setSize( window.innerWidth, window.innerHeight )
+            // camera.position.z = 20
+
+            function input() {
+                window.addEventListener("resize", () => {
+                    this.camera.aspect = window.innerWidth / window.innerHeight
+                    this.camera.updateProjectionMatrix()
+                    this.renderer.setSize(window.innerWidth, window.innerHeight)
+                })
+                this.keys = {w: false, a: false, s: false, d: false, space: false}
+                this.forward = new THREE.Vector3(0, 0, -1)
+                this.backward = new THREE.Vector3(0, 0, 1)
+                this.leftward = new THREE.Vector3(-1, 0, 0)
+                this.rightward = new THREE.Vector3(1, 0, 0)
+
+                document.addEventListener('keydown', (e) => {
+                    switch(e.keyCode) {
+                        case 87:
+                            this.keys.w = true
+                            break
+                        case 65:
+                            this.keys.a = true
+                            break
+                        case 83:
+                            this.keys.s = true
+                            break
+                        case 68:
+                            this.keys.d = true
+                            break
+                        case 32:
+                            this.keys.space = true
+                            break
+                    }
+                })
+
+                document.addEventListener('keyup', (e) => {
+                    switch(e.keyCode){
+                        case 87:
+                            this.keys.w = false
+                            break
+                        case 65:
+                            this.keys.a = false
+                            break
+                        case 83:
+                            this.keys.s = false
+                            break
+                        case 68:
+                            this.keys.d = false
+                            break
+                        case 32:
+                            this.keys.space = false
+                            break
+                    }
+                })
+            }
+
+            const light = {
+                name: 'light',
+                load(game) {
+                    const lights = []
+                    const amb = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1)
+                    amb.position.set(0, 10, 0)
+                    lights.push(amb)
+                    const dir = new THREE.DirectionalLight(0xFFFFFF, 1)
+                    dir.position.set(0, 10, 5)
+                    lights.push(dir)
+                    this._model = lights
+
+                    return this._model
+                }
+            }
+            const world = {
+                name: 'world',
+                load(game) {
+                    this.group = new THREE.Group()
+                    const floor = new THREE.Mesh(new THREE.PlaneGeometry(500, 500), new THREE.MeshPhongMaterial({color: '#ac8e82'}))
+                    floor.rotation.x = -Math.PI * 0.5
+                    floor.position.set(0, 0, 0)
+                    this.group.add(floor)
+
+                    const mat = new THREE.MeshPhongMaterial( { color: 0x156289, emissive: 0x072534, side: THREE.DoubleSide, flatShading: true } )
+	                const cube = new THREE.BoxGeometry(1, 3, 3)
+	                const mesh = new THREE.Mesh(cube, mat)
+                    mesh.position.set(-2, 0, -2)
+                    this.group.add(mesh)
+
+	                const mesh1 = new THREE.Mesh(cube, mat)
+                    mesh1.position.set(2, 0, 2)
+                    this.group.add(mesh1)
+
+                    const navmesh = new NavMeshGenerator('./lib/recast.wasm', game.loadingManager)
+                    navmesh.generate(this.group).then(mesh=>{
+                        if(mesh) {
+                            mesh.layers.set(1)
+                            this.group.add(mesh)
+                        }
+                    })
+
+                    return this.group
+                },
+                model() {
+                    return this.group
+                }
+            }
+            const car = {
+                name: 'actor',
+                load(game) {
+                    this.group = new THREE.Group()
+                    this.group.name = 'actor'
+
+                    const loader = new GLTFLoader(game.loadingManager)
+                    loader.load(`./lib/car.glb`, function (object) {
+                        const gltf = object.scene
+                        gltf.scale.set(0.3, 0.3, 0.3)
+
+                        gltf.rotateY(Math.PI)
+                        gltf.name='car'
+                        gltf.traverse((o)=>{
+                            o.layers.set(1)
+                        })
+                        this.group.add(gltf)
+                    }.bind(this))
+
+                    const texture = new THREE.TextureLoader().load("./lib/arrow.png");
+                    const spriteMaterial = new THREE.SpriteMaterial({
+                        map: texture,
+                    });
+                    const icon = new THREE.Sprite(spriteMaterial)
+                    icon.name='red-point'
+                    icon.scale.set(2, 2, 1)
+                    icon.layers.set(2)
+                    this.group.add(icon)
+
+                    return this.group
+                },
+                model() {
+                    return this.group
+                }
+            }
+
+            const control = (game)=>{
+                game.minimap.update()
+                const dt = game.clock.getDelta()
+                const car = game.get('actor').model()
+
+                if(game.keys.w) car.position.add(game.forward.clone().multiplyScalar(dt))
+                if(game.keys.s) car.position.add(game.backward.clone().multiplyScalar(dt))
+                if(game.keys.a) car.position.add(game.leftward.clone().multiplyScalar(dt))
+                if(game.keys.d) car.position.add(game.rightward.clone().multiplyScalar(dt))
+                // if(keys.space) shoot(dt)
+            }
+
+
+            // const game = new Xert({renderer, scene, camera, container})
+            const game = new Xert()
+            game.reg(manager)
+            game.reg(input)
+
+            game.add(light)
+            game.add(world)
+            game.add(car)
+
+            game.use(control)
+
+            game.start()
+            // TODO: shoot / crosshair / muzzle flash / swat gltf
+
+        </script>
+    </body>
+</html>

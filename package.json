@@ -1,0 +1,42 @@
+{
+  "name": "xert",
+  "version": "1.0.0",
+  "description": "A lightweight ECS framework based on three.js",
+  "type": "module",
+  "main": "dist/xert.js",
+  "module": "dist/xert.module.js",
+  "files": [
+    "dist",
+    "example",
+    "LICENSE",
+    "README.md",
+    "package.json"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/liangshanpo/xert"
+  },
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "rollup -c -w --environment BUILD:dev",
+    "build": "rollup -c --environment BUILD:prod",
+    "publish": "npm run build && npm pack"
+  },
+  "keywords": ["xert", "ecs", "threejs", "navmesh", "astar"],
+  "author": "zhigang.li",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.23.9",
+    "@babel/preset-env": "^7.23.9",
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-wasm": "^6.2.2",
+    "rollup": "^4.9.6",
+    "rollup-plugin-livereload": "^2.0.5",
+    "rollup-plugin-serve": "^1.1.1"
+  },
+  "dependencies": {
+    "three": "^0.160.1"
+  }
+}
