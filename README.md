@@ -21,7 +21,7 @@ System：游戏需要借助的外部功能，如渲染、UI、声音、控制等
 3. Script: 包含每帧都运行的代码，负责控制游戏逻辑和对象行为，使用箭头函数；
 
 
-
+  
 ### API
 
 #### 1. const game = new Xert()
@@ -43,13 +43,13 @@ System：游戏需要借助的外部功能，如渲染、UI、声音、控制等
 开始游戏。
 
 
-
+  
 ### 安装 Install
 ```shell
 npm install xert 
 ```
 
-
+  
 ### 示例 Examples
 
 ```javascript
@@ -72,6 +72,6 @@ game.start()
 
 
 
-
+  
 ### License
 [MIT](LICENSE) © Li zhigang
