@@ -10,8 +10,8 @@ Xert 提倡组合优于继承、外观行为分离、不重复造轮子。
 
 
 Xert 对 ECS 的理解：
-Entity：游戏中的所有对象，需要自定义，包含外观和行为；
-Component：构成游戏对象的组件，不需要自定义、由 Three.js 提供，可借助 ES6 语言特性实现，如getter/setter；
+Entity：游戏中的所有对象，需要自定义，包含外观和行为；  
+Component：构成游戏对象的组件，不需要自定义、由 Three.js 提供，可借助 ES6 语言特性实现，如getter/setter；  
 System：游戏需要借助的外部功能，如渲染、UI、声音、控制等，不需要自定义，由浏览器、HTML、三方类库等提供；
 
 
