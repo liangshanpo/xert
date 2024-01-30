@@ -22,7 +22,13 @@
     "build": "rollup -c --environment BUILD:prod",
     "publish": "npm run build && npm pack"
   },
-  "keywords": ["xert", "ecs", "threejs", "navmesh", "astar"],
+  "keywords": [
+    "xert",
+    "ecs",
+    "threejs",
+    "navmesh",
+    "astar"
+  ],
   "author": "zhigang.li",
   "license": "MIT",
   "devDependencies": {
