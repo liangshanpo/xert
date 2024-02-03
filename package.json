@@ -14,13 +14,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/liangshanpo/xert"
+    "url": "git+https://github.com/liangshanpo/xert.git"
   },
   "scripts": {
     "start": "npm run dev",
     "dev": "rollup -c -w --environment BUILD:dev",
     "build": "rollup -c --environment BUILD:prod",
-    "publish": "git push --tags && git push && npm publish"
+    "publish": "git push --tags && npm publish"
   },
   "keywords": [
     "xert",
@@ -40,9 +40,10 @@
     "@rollup/plugin-wasm": "^6.2.2",
     "rollup": "^4.9.6",
     "rollup-plugin-livereload": "^2.0.5",
-    "rollup-plugin-serve": "^1.1.1"
+    "rollup-plugin-serve": "^1.1.1",
+    "three": "^0.160.1"
   },
   "peerDependencies": {
-    "three": "^0.160.1"
+    "three": "0.x.x"
   }
 }
