@@ -20,7 +20,7 @@
     "start": "npm run dev",
     "dev": "rollup -c -w --environment BUILD:dev",
     "build": "rollup -c --environment BUILD:prod",
-    "publish": "git push --tags && npm publish"
+    "publish": "git push --tags && git push && npm publish"
   },
   "keywords": [
     "xert",

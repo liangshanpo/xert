@@ -21,12 +21,12 @@ class Xert {
         this.scripts.push(script)
     }
     add(entity) {
-        const parent = entity.hasOwnProperty('parent') ? this.scene.getObjectByName(entity.parent) : this.scene
+        const parent = entity.hasOwnProperty('parent') ? this.entitys.get(entity.parent)?.model : this.scene
         const add_to_scene = (model)=>{
             if(model instanceof Array) {
                 for(const m of model) add_to_scene(m)
             } else {
-                model && parent.add(model)
+                model && parent && parent.add(model)
             }
         }
         if(Reflect.get(entity.load, Symbol.toStringTag) == 'AsyncFunction') {
