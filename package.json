@@ -5,6 +5,13 @@
   "type": "module",
   "main": "dist/xert.js",
   "module": "dist/xert.module.js",
+  "exports": {
+    ".": {
+      "import": "./dist/xert.module.js",
+      "require": "./dist/xert.js"
+    },
+    "./recast.wasm": "./dist/recast.wasm"
+  },
   "files": [
     "dist",
     "example",
