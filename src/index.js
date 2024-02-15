@@ -23,7 +23,7 @@ class Xert {
     add(entity) {
         const parent = entity.hasOwnProperty('parent') ? this.entitys.get(entity.parent)?.model : this.scene
         const add_to_scene = (model)=>{
-            if(model instanceof Array) {
+            if(typeof model[Symbol.iterator] === 'function') {
                 for(const m of model) add_to_scene(m)
             } else {
                 model && parent && parent.add(model)
