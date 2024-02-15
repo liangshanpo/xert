@@ -49,6 +49,7 @@ export default class Minimap {
 
     updateCamera() {
         const target = this.scene.getObjectByName(this.target)
+        if(! target) return
         if (this.syncRotateZ) {
             let targetRotateY = THREE.MathUtils.radToDeg(target.rotation.y)
             this.renderer.domElement.style.transform = `rotateZ(${targetRotateY}deg)`

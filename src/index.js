@@ -30,13 +30,14 @@ class Xert {
             }
         }
         if(Reflect.get(entity.load, Symbol.toStringTag) == 'AsyncFunction') {
-            entity.load(this).then(model=>{
+            entity.load(this).then(res=>{
+                add_to_scene(entity.model)
                 this.entitys.set(entity.name, entity)
-                add_to_scene(model)
             })
         } else {
+            entity.load(this)
+            add_to_scene(entity.model)
             this.entitys.set(entity.name, entity)
-            add_to_scene(entity.load(this))
         }
     }
     get(name) {

@@ -234,9 +234,9 @@
                     const dir = new THREE.DirectionalLight(0xFFFFFF, 1)
                     dir.position.set(0, 10, 5)
                     lights.push(dir)
-                    this._model = lights
+                    this.model = lights
 
-                    return this._model
+                    return this.model
                 }
             }
             const world = {
@@ -268,28 +268,39 @@
 
                     return this.group
                 },
-                model() {
+                get model() {
                     return this.group
                 }
             }
             const car = {
                 name: 'actor',
-                load(game) {
+                async load(game) {
                     this.group = new THREE.Group()
                     this.group.name = 'actor'
 
-                    const loader = new GLTFLoader(game.loadingManager)
-                    loader.load(`./lib/car.glb`, function (object) {
-                        const gltf = object.scene
-                        gltf.scale.set(0.3, 0.3, 0.3)
+                    // const loader = new GLTFLoader(game.loadingManager)
+                    // loader.load(`./lib/car.glb`, function (object) {
+                    //     const gltf = object.scene
+                    //     gltf.scale.set(0.3, 0.3, 0.3)
 
-                        gltf.rotateY(Math.PI)
-                        gltf.name='car'
-                        gltf.traverse((o)=>{
-                            o.layers.set(1)
-                        })
-                        this.group.add(gltf)
-                    }.bind(this))
+                    //     gltf.rotateY(Math.PI)
+                    //     gltf.name='car'
+                    //     gltf.traverse((o)=>{
+                    //         o.layers.set(1)
+                    //     })
+                    //     this.group.add(gltf)
+                    // }.bind(this))
+
+                    const object = await new GLTFLoader(game.loadingManager).loadAsync('./lib/car.glb')
+                    const gltf = object.scene
+                    gltf.scale.set(0.3, 0.3, 0.3)
+
+                    gltf.rotateY(Math.PI)
+                    gltf.name='car'
+                    gltf.traverse((o)=>{
+                        o.layers.set(1)
+                    })
+                    this.group.add(gltf)
 
                     const texture = new THREE.TextureLoader().load("./lib/arrow.png");
                     const spriteMaterial = new THREE.SpriteMaterial({
@@ -303,7 +314,7 @@
 
                     return this.group
                 },
-                model() {
+                get model() {
                     return this.group
                 }
             }
@@ -311,7 +322,8 @@
             const control = (game)=>{
                 game.minimap.update()
                 const dt = game.clock.getDelta()
-                const car = game.get('actor').model()
+                const car = game.get('actor')?.model
+                if(!car) return
 
                 if(game.keys.w) car.position.add(game.forward.clone().multiplyScalar(dt))
                 if(game.keys.s) car.position.add(game.backward.clone().multiplyScalar(dt))
