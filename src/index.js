@@ -6,9 +6,10 @@ class Xert {
     scripts = []
     entitys = new Map()
 
-    constructor({id, scene, camera, renderer, container}={}) {
+    constructor({id, scene, clock, camera, renderer, container}={}) {
         this.id = id || 'xert-canvas'
         this.scene = scene
+        this.clock = clock
         this.camera = camera
         this.renderer = renderer
         this.container = container || document.body
@@ -46,10 +47,11 @@ class Xert {
 
     render() {
         this.renderer.render(this.scene, this.camera)
-
         if(! this.active) return
+
+        const dt = this.clock.getDelta()
         for(const script of this.scripts) {
-            script(this)
+            script(this, dt)
         }
     }
     start() {

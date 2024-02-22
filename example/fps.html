@@ -319,9 +319,8 @@
                 }
             }
 
-            const control = (game)=>{
+            const control = (game, dt)=>{
                 game.minimap.update()
-                const dt = game.clock.getDelta()
                 const car = game.get('actor')?.model
                 if(!car) return
 
