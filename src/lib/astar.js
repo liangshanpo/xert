@@ -1,4 +1,4 @@
-export default class AStar{
+export default class AStar {
     constructor(graph, diagonal=false) {
         this.graph = graph
         this.diagonal = diagonal

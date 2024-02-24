@@ -1,6 +1,7 @@
 import AStar from './lib/astar'
 import Minimap from './lib/minimap'
 import NavMeshGenerator from './lib/navmesh'
+import SFX from './lib/sfx'
 
 class Xert {
     scripts = []
@@ -63,4 +64,4 @@ class Xert {
     }
 }
 
-export {Xert, AStar, Minimap, NavMeshGenerator}
+export {Xert, AStar, Minimap, NavMeshGenerator, SFX}
