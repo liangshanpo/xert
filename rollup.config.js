@@ -28,6 +28,7 @@ export default {
             name: 'Xert',
             globals: {
                 'three': 'THREE',
+                'three/addons/math/ImprovedNoise.js': 'ImprovedNoise',
                 'three/addons/utils/BufferGeometryUtils.js': 'BufferGeometryUtils'
             }
         },
